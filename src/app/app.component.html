@@ -1,21 +1,125 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<p></p>
+<div class="container">
+  <ul class="nav nav-pills">
+    <li>
+      <button (click)="onMultiplication()" class="btn btn-primary">X.matMul(Y)</button>
+    </li>
+    <li>
+      <button (click)="onTransposeX()" class="btn btn-primary">X.transpose()</button>
+    </li>
+    <li>
+      <button (click)="onTransposeY()" class="btn btn-primary">tf.transpose(Y)</button>
+    </li>
+    <li>
+      <button (click)="reluX()" class="btn btn-primary">X.relu()</button>
+    </li>
+    <li>
+      <button (click)="sigmoid()" class="btn btn-primary">tf.sigmoid(y)</button>
+    </li>
+    <li>
+      <button (click)="argMaxX()" class="btn btn-primary">X.argMax(0)</button>
+    </li>
+    <li>
+      <button (click)="argMaxY()" class="btn btn-primary">Y.argMax(1)</button>
+    </li>
+  </ul>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<p></p>
+<div class="container">
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">Tensor X</div>
+      <div class="panel-body">
+        <table *ngIf="x" class=" table table-bordered">
+          <tr *ngFor="let line of x.arraySync()">
+            <td *ngFor="let val of line">{{val|number:'0.2'}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">Tensor Y</div>
+      <div class="panel-body">
+        <table *ngIf="y" class=" table table-bordered">
+          <tr *ngFor="let line of y.arraySync()">
+            <td *ngFor="let val of line">{{val|number:'0.2'}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">Tensor Z</div>
+      <div class="panel-body">
+        <table *ngIf="z" class=" table table-bordered">
+          <tr *ngFor="let line of z.arraySync()">
+            <td *ngFor="let val of line">{{val|number:'0.2'}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
 
-<router-outlet></router-outlet>
+
+</div>
+<p></p>
+<div class="container">
+  <div class="panel panel-default">
+    <div class="panel-heading">Neural Network Model</div>
+    <div class="panel-body">
+
+      <ul class="nav nav-pills">
+        <li>
+          <button class="btn btn-success" (click)="createModel()">Create Model</button>
+        </li>
+        <li>
+          <button class="btn btn-success" (click)="trainModel()">Train Model</button>
+        </li>
+        <li>
+          <button class="btn btn-success" (click)="saveModel()">Save Model</button>
+        </li>
+        <li>
+          <button class="btn btn-success" (click)="loadModel()">Load Model</button>
+        </li>
+      </ul>
+      <div class="row">
+        <div class="col-md-9">
+          <progress-bar [progress]="trainProgress" [color-degraded]="{'0': '#00cbcb',  '15': '#f9c3d3', '25': '#fd8c8e'}">
+          </progress-bar>
+        </div>
+        <div class="col-md-3 padding">
+          <label>Loss:</label>
+          <label>{{currentLoss}}</label>
+        </div>
+
+      </div>
+
+      <div class="col-md-4 padding" *ngIf="modelCreated">
+        <img src="assets/images/model.png" class="img-thumbnail">
+      </div>
+      <div class="col-md-4 padding" *ngIf="modelTrained">
+        <div class="form-group">
+          <label class="control-label">Poids (kg)</label>
+          <input type="text" [(ngModel)]="poids" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="control-label">Taille (m)</label>
+          <input type="text" [(ngModel)]="taille" class="form-control">
+          <button class="btn btn-primary" (click)="predict()">Predict</button>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Predicted output : </label>
+          <label class="control-label text-danger"> {{output}}</label>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Correct output : </label>
+          <label class="control-label text-primary"> {{getCorrectOutput()}}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
